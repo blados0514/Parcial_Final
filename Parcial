@@ -1,1 +1,67 @@
 --Blaimir Ospina Cardona
+
+--FUNCTION 
+
+
+create or replace function CALCULAR_CAJAS_NECESARIAS  (numero_items NUMBER, cantidad_cajas_grandes NUMBER, cantidad_caja_pequenas NUMBER) RETURN NUMBER AS
+
+contador_grande NUMBER:=0;
+contador_pequenas NUMBER:=0;
+validador_cajas NUMBER:=numero_items;
+
+caja_grandes NUMBER:=cantidad_cajas_grandes;
+caja_pequeña NUMBER:=cantidad_caja_pequenas;
+
+mostrar NUMBER:=0;
+
+BEGIN
+    FOR ln_index IN 1..numero_items LOOP
+        IF validador_cajas > 5 THEN
+              IF  ln_index MOD 5 = 0 THEN
+                    contador_grande := contador_grande + 1;
+                    validador_cajas := validador_cajas - 5;
+                    IF caja_grandes > 0 THEN
+                        caja_grandes := caja_grandes -1;
+                    ELSE
+                       RETURN -1;
+                    END IF;
+              END IF;
+              IF validador_cajas < 5 THEN
+                IF caja_pequeña > 0 THEN
+                     contador_pequenas := validador_cajas;
+                        caja_pequeña := caja_pequeña -1;
+                        EXIT;
+                    ELSE
+                       RETURN -1;
+                    END IF;
+                END IF;
+            END IF;
+    END LOOP;    
+    
+    RETURN  contador_grande + contador_pequenas;
+    
+END;
+
+
+
+
+--- PROCEDURE
+
+
+
+create or replace PROCEDURE PROCESAR_PEDIDOS AS
+
+CURSOR lcur_tabla IS SELECT * FROM PEDIDOS;
+
+ln_existe NUMBER:=0;
+
+BEGIN
+    FOR ln_index IN lcur_tabla LOOP
+    
+         ln_existe :=CALCULAR_CAJAS_NECESARIAS (ln_index.ITEMS,ln_index.CAJAS_GRANDES,ln_index.CAJAS_PEQUENAS);
+        
+        IF ln_existe > 0 THEN
+          INSERT INTO PEDIDOS (ITEMS) VALUES (ln_existe);
+        END IF;
+    END LOOP;
+END;
