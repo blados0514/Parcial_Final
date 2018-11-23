@@ -69,3 +69,18 @@ BEGIN
         END IF;
     END LOOP;
 END;
+
+
+-- PUNTO 
+
+
+create or replace function LARGEST_SUM  (MATRIZ NUMBER) RETURN NUMBER AS
+
+
+type Array_Novedades is varray(5) of number(2);
+ARRAY_1  Array_Novedades := Array_Novedades (-2,-3,4,-1,-2,1,5,-3);
+
+BEGIN
+
+    NULL;
+END;
