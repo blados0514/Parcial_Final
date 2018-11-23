@@ -2,7 +2,6 @@
 
 --FUNCTION 
 
-
 create or replace function CALCULAR_CAJAS_NECESARIAS  (numero_items NUMBER, cantidad_cajas_grandes NUMBER, cantidad_caja_pequenas NUMBER) RETURN NUMBER AS
 
 contador_grande NUMBER:=0;
@@ -26,16 +25,21 @@ BEGIN
                        RETURN -1;
                     END IF;
               END IF;
+         END IF;
               IF validador_cajas < 5 THEN
-                IF caja_pequeña > 0 THEN
-                     contador_pequenas := validador_cajas;
-                        caja_pequeña := caja_pequeña -1;
-                        EXIT;
-                    ELSE
-                       RETURN -1;
-                    END IF;
-                END IF;
+                IF validador_cajas < caja_pequeña THEN
+                        IF caja_pequeña > 0 THEN
+                         contador_pequenas := validador_cajas;
+                            caja_pequeña := caja_pequeña -1;
+                            EXIT;
+                        ELSE
+                           RETURN -1;
+                        END IF;
+                 ELSE
+                  RETURN -1;  
+                 END IF;
             END IF;
+             
     END LOOP;    
     
     RETURN  contador_grande + contador_pequenas;
@@ -44,9 +48,7 @@ END;
 
 
 
-
 --- PROCEDURE
-
 
 
 create or replace PROCEDURE PROCESAR_PEDIDOS AS
@@ -61,7 +63,9 @@ BEGIN
          ln_existe :=CALCULAR_CAJAS_NECESARIAS (ln_index.ITEMS,ln_index.CAJAS_GRANDES,ln_index.CAJAS_PEQUENAS);
         
         IF ln_existe > 0 THEN
-          INSERT INTO PEDIDOS (ITEMS) VALUES (ln_existe);
+          UPDATE PEDIDOS SET CANTIDAD_CAJAS = ln_existe
+          WHERE ITEMS = ln_index.items;
+          COMMIT;
         END IF;
     END LOOP;
 END;
